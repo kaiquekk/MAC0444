@@ -1,0 +1,42 @@
+Para exportar arquivos csv:
+- use_module(library(csv)).
+
+Para retornar os filmes para o arquivo movies.csv:
+- findall(row(M, R, T, D), (filme(M, R), tit_dur(M, T, D)), Rows), csv_write_file('movies.csv', Rows).
+
+Usando o plugin Cellfie do protege, importar o arquivo movies.xls, selecionar todos os registros e adicionar a regra:
+- Individual: @A*
+	Types: Filme
+	Facts: dataEstreia @B*(xsd:integer), titulo @C*(xsd:string), duracao @D*(xsd:integer) 
+
+Para retornar os atores para o arquivo actor.csv:
+- findall(row(Am, F, P, Fn, Ln), (ator(F, Am, P), nome(Am, Fn, Ln)), Rows), csv_write_file('actor.csv', Rows).
+
+Usando o plugin Cellfie do protege, importar o arquivo actor.xls, selecionar todos os registros e adicionar a regra:
+- Individual: @A*
+	Types: Ator
+	Facts: firstName @D*(xsd:string), familyName @E*(xsd:string), gender "male"
+
+Para retornar as atrizes para o arquivo actress.csv:
+- findall(row(Af, F, P, Fn, Ln), (atriz(F, Af, P), nome(Af, Fn, Ln)), Rows), csv_write_file('actress.csv', Rows).
+
+Usando o plugin Cellfie do protege, importar o arquivo actor.xls, selecionar todos os registros e adicionar a regra:
+- Individual: @A*
+	Types: Ator
+	Facts: firstName @D*(xsd:string), familyName @E*(xsd:string), gender "female"
+
+Para retornar os diretores para o arquivo director.csv:
+- findall(row(D, F, Fn, Ln), (diretor(F, D), nome(D, Fn, Ln)), Rows), csv_write_file('director.csv', Rows).
+
+Usando o plugin Cellfie do protege, importar o arquivo director.xls, selecionar todos os registros e adicionar as regras:
+- Individual: @A*
+	Types: Diretor
+	Facts: firstName @C*(xsd:string), familyName @D*(xsd:string), dirige @B*
+- Individual: @B*
+	Types: Filme
+	Facts: dirigidoPor @A*
+
+Links úteis:
+- https://github.com/protegeproject/cellfie-plugin/wiki/Grocery-Tutorial
+- https://stackoverflow.com/questions/44773889/add-multiple-individual-at-once-in-protege
+- https://stackoverflow.com/questions/27320819/write-data-to-csv-file-from-swi-prolog-code
