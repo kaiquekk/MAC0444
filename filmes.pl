@@ -2422,7 +2422,7 @@ ator(the_oxford_murders, alex_cox, kalman).
 ator(the_oxford_murders, burn_gorman, yuri_podorov).
 ator(the_oxford_murders, dominique_pinon, frank).
 atriz(the_oxford_murders, anna_massey, mrs_eagleton).
-ator(dthe_oxford_murders, danny_sapani, scott).
+ator(the_oxford_murders, danny_sapani, scott).
 
 filme(home_alone_3, 1997).
 diretor(home_alone_3, raja_gosnell).
@@ -5706,4 +5706,3 @@ tit_dur(the_theory_of_everything, 'The Theory of Everything', 123).
 tit_dur(the_usual_suspects, 'The Usual Suspects', 106).
 tit_dur(the_virgin_suicides, 'The Virgin Suicides', 97).
 tit_dur(torrance_rises, 'Torrance Rises', 34).
-
