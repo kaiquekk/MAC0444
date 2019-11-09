@@ -1,3 +1,13 @@
+Para mudar o diretório de trabalho:
+- working_directory(_, 'novo').
+
+Para importar o dataset do arquivo filmes.pl:
+- consult(filmes).
+
+*O prolog não reconhece alguns caracteres como ü, então é preciso mudar dois dados do dataset:
+- Linha 1236: ator(the_da_vinci_code, jürgen_prochnow, andre_vernet).
+- Linha 4363: nome(jürgen_prochnow, 'Jürgen', 'Prochnow').
+
 Para exportar arquivos csv:
 - use_module(library(csv)).
 
@@ -9,21 +19,37 @@ Usando o plugin Cellfie do protege, importar o arquivo movies.xls, selecionar to
 	Types: Filme
 	Facts: dataEstreia @B*(xsd:integer), titulo @C*(xsd:string), duracao @D*(xsd:integer) 
 
+*Para os atores e atrizes é feita uma concatenação entre os campos Nome-Filme-Personagem para criar um campo de indivíduo Atuacao único.
+
 Para retornar os atores para o arquivo actor.csv:
-- findall(row(Am, F, P, Fn, Ln), (ator(F, Am, P), nome(Am, Fn, Ln)), Rows), csv_write_file('actor.csv', Rows).
+- findall(row(Am, F, P, Fn, Ln, At), (ator(F, Am, P), nome(Am, Fn, Ln), atom_concat(Am, F, X), atom_concat(X, P, At)), Rows), csv_write_file('actor.csv', Rows).
 
 Usando o plugin Cellfie do protege, importar o arquivo actor.xls, selecionar todos os registros e adicionar a regra:
 - Individual: @A*
 	Types: Ator
 	Facts: firstName @D*(xsd:string), familyName @E*(xsd:string), gender "male"
 
+- Individual: @C*
+	Types: Personagem
+
+-Individual: @F*(mm:hashEncode)
+	Types: Atuacao
+	Facts: temAtor @A*(xsd:string),  noFilme @B*(xsd:string), comoPersonagem @C*(xsd:string)
+
 Para retornar as atrizes para o arquivo actress.csv:
-- findall(row(Af, F, P, Fn, Ln), (atriz(F, Af, P), nome(Af, Fn, Ln)), Rows), csv_write_file('actress.csv', Rows).
+- findall(row(Af, F, P, Fn, Ln, At), (atriz(F, Af, P), nome(Af, Fn, Ln), atom_concat(Af, F, X), atom_concat(X, P, At)), Rows), csv_write_file('actress.csv', Rows).
 
 Usando o plugin Cellfie do protege, importar o arquivo actor.xls, selecionar todos os registros e adicionar a regra:
 - Individual: @A*
 	Types: Ator
 	Facts: firstName @D*(xsd:string), familyName @E*(xsd:string), gender "female"
+
+- Individual: @C*
+	Types: Personagem
+
+-Individual: @F*(mm:hashEncode)
+	Types: Atuacao
+	Facts: temAtor @A*(xsd:string),  noFilme @B*(xsd:string), comoPersonagem @C*(xsd:string)
 
 Para retornar os diretores para o arquivo director.csv:
 - findall(row(D, F, Fn, Ln), (diretor(F, D), nome(D, Fn, Ln)), Rows), csv_write_file('director.csv', Rows).
