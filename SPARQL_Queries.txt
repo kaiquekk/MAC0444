@@ -1,16 +1,45 @@
 *Para executar as queries, usar a interface gráfica providenciada pelo monitor em https://github.com/viniciusbm/sparqlguiwrapper.
 
-1.	PREFIX  rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+Cabeçalho que deve estar presente em todas as queries:
+
+	PREFIX  rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 	PREFIX  owl: <http://www.w3.org/2002/07/owl#>
 	PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 	PREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>
 	PREFIX   ep: <http://www.semanticweb.org/kaiqu/ontologies/2019/10MAC444-EP#>
 	PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 
-	SELECT ?title
+
+1. 	SELECT ?TituloDoFilme
 	WHERE {
 	  ?dir rdf:type ep:Diretor .
-	  ?Filme ep:titulo ?title .
+	  ?Filme ep:titulo ?TituloDoFilme .
 	  ?Filme ep:dirigidoPor ?dir .
 	  FILTER (?dir = ep:D)
-	} ORDER BY ASC(?title)
+	} ORDER BY ASC(?TituloDoFilme)
+
+2.	SELECT ?PrimeiroNome ?UltimoNome ?Personagem
+	WHERE {
+  	  ?Atuacao ep:noFilme ?filme ;
+  	  ep:temAtor ?ator ;
+  	  ep:comoPersonagem ?Personagem .
+	  ?filme ep:titulo ?title .
+  	  ?ator foaf:firstName ?PrimeiroNome .
+  	  ?ator foaf:familyName ?UltimoNome .
+    	  FILTER (STR(?title) = "Ft")
+	} ORDER BY ASC(?PrimeiroNome) ASC(?UltimoNome)
+
+3.
+
+4.	SELECT DISTINCT ?Filme ?Duracao
+	WHERE {
+  	  ?dir rdf:type ep:Diretor .
+  	  ?dir ep:dirige ?filme .
+  	  ?Filme ep:dirigidoPor ?dir .
+  	  ?Filme ep:duracao ?Duracao .
+  	  ?Atuacao ep:noFilme ?Filme ;
+  	  ep:temAtor ?ator .
+  	  VALUES ?ator { ep:X ep:Y }
+  	  FILTER (?filme = ep:F)
+	} ORDER BY ASC(?Duracao)
