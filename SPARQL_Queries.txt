@@ -1,5 +1,7 @@
 *Para executar as queries, usar a interface gráfica providenciada pelo monitor em https://github.com/viniciusbm/sparqlguiwrapper.
 
+*Para remover os datatypes na hora do resultado: https://stackoverflow.com/questions/23626194/removing-datatypes-from-literals-in-sparql-results
+
 
 Cabeçalho que deve estar presente em todas as queries:
 
@@ -58,28 +60,17 @@ Cabeçalho que deve estar presente em todas as queries:
   	  FILTER (?filme = ep:F)
 	} ORDER BY ASC(?Duracao)
 
-5.  	SELECT ?nome ?sobrenome ?personagem ?filmeAtuou ?filmeDirigido
+5.  	SELECT ?a ?personagem ?filmeAtuou ?filmeDirigido
 	WHERE {
   		?a rdf:type ep:Diretor .
   		?a ep:dirige ?filmeDirigido .
   		?at rdf:type ep:Atuacao .
   		?at ep:temAtor ?a .
-  		?a foaf:firstName ?nome .
-  		?a foaf:familyName ?sobrenome .
   		?at ep:comoPersonagem ?personagem .
   		?at ep:noFilme ?filmeAtuou.
 	}
 
-########################################################
-PROBLEMA NA 5:
-	Ta repetindo o nome da pessoa no resultado (1 linha na 
-	tabela pra cada par diferente de filme dirigido/atuado)
-
-Preferi seguir adiante e dps resolver esse problema. (edu).
-
-########################################################
-
-6. 	SELECT ?n ?nome ?sobrenome ?filme 
+6. 	SELECT ?n ?dir ?filme 
 	WHERE {
   		?dir rdf:type ep:Diretor .
   		?dir ep:dirige ?filme .
@@ -90,8 +81,6 @@ Preferi seguir adiante e dps resolver esse problema. (edu).
   		?at2 ep:noFilme ?filme .
   		?at2 ep:temAtor ?a2 .
   		?filme ep:dataEstreia ?n .
-  		?dir foaf:firstName ?nome .
-  		?dir foaf:familyName ?sobrenome .
   		?at1 ep:noFilme ?filmeAtuou.
   		FILTER(?at1 != ?at2).
  	 	FILTER(?a1 = ep:X).
