@@ -30,7 +30,21 @@ Cabeçalho que deve estar presente em todas as queries:
     	  FILTER (STR(?title) = "Ft")
 	} ORDER BY ASC(?PrimeiroNome) ASC(?UltimoNome)
 
-3.
+3.	SELECT ?tit ?dir ?ano
+	WHERE {
+  		?at1 rdf:type ep:Atuacao .
+  		?at1 ep:noFilme ?filme .
+  		?at1 ep:temAtor ?a1 .
+  		?at2 rdf:type ep:Atuacao .
+  		?at2 ep:noFilme ?filme .
+  		?at2 ep:temAtor ?a2 .
+  		?filme ep:titulo ?tit .
+  		?filme ep:dirigidoPor ?dir .
+  		?filme ep:dataEstreia ?ano .
+  		FILTER (?a1 = ep:X)
+  		FILTER (?a2 = ep:Y)
+  		FILTER (?at1 != ?at2)
+	} ORDER BY DESC(?ano)
 
 4.	SELECT DISTINCT ?Filme ?Duracao
 	WHERE {
@@ -43,3 +57,49 @@ Cabeçalho que deve estar presente em todas as queries:
   	  VALUES ?ator { ep:X ep:Y }
   	  FILTER (?filme = ep:F)
 	} ORDER BY ASC(?Duracao)
+
+5.  	SELECT ?nome ?sobrenome ?personagem ?filmeAtuou ?filmeDirigido
+	WHERE {
+  		?a rdf:type ep:Diretor .
+  		?a ep:dirige ?filmeDirigido .
+  		?at rdf:type ep:Atuacao .
+  		?at ep:temAtor ?a .
+  		?a foaf:firstName ?nome .
+  		?a foaf:familyName ?sobrenome .
+  		?at ep:comoPersonagem ?personagem .
+  		?at ep:noFilme ?filmeAtuou.
+	}
+
+########################################################
+PROBLEMA NA 5:
+	Ta repetindo o nome da pessoa no resultado (1 linha na 
+	tabela pra cada par diferente de filme dirigido/atuado)
+
+Preferi seguir adiante e dps resolver esse problema. (edu).
+
+########################################################
+
+6. 	SELECT ?n ?nome ?sobrenome ?filme 
+	WHERE {
+  		?dir rdf:type ep:Diretor .
+  		?dir ep:dirige ?filme .
+  		?at1 rdf:type ep:Atuacao .
+  		?at1 ep:noFilme ?filme .
+  		?at1 ep:temAtor ?a1 .
+  		?at2 rdf:type ep:Atuacao .
+  		?at2 ep:noFilme ?filme .
+  		?at2 ep:temAtor ?a2 .
+  		?filme ep:dataEstreia ?n .
+  		?dir foaf:firstName ?nome .
+  		?dir foaf:familyName ?sobrenome .
+  		?at1 ep:noFilme ?filmeAtuou.
+  		FILTER(?at1 != ?at2).
+ 	 	FILTER(?a1 = ep:X).
+  		FILTER(?a2 = ep:Y).
+  		VALUES (?n1 ?n2){
+    			(n1 n2)
+  		}
+  		FILTER(?n >= ?n1 && ?n <= ?n2).
+  
+	}ORDER BY ASC (?n)
+
