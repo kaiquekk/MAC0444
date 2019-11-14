@@ -2,6 +2,9 @@
 
 *Para remover os datatypes na hora do resultado: https://stackoverflow.com/questions/23626194/removing-datatypes-from-literals-in-sparql-results
 
+*Verificar se os parâmetros de string das consultas 2 e 8 devem ser STR(?title)="Ft" ou STR(?title)=Ft.
+
+*Verificar se é para repetir pessoas na consulta 5.
 
 Cabeçalho que deve estar presente em todas as queries:
 
@@ -15,80 +18,117 @@ Cabeçalho que deve estar presente em todas as queries:
 
 1. 	SELECT ?TituloDoFilme
 	WHERE {
-	  ?dir rdf:type ep:Diretor .
-	  ?Filme ep:titulo ?TituloDoFilme .
-	  ?Filme ep:dirigidoPor ?dir .
-	  FILTER (?dir = ep:D)
+	  	?Filme ep:titulo ?TituloDoFilme .
+	  	?Filme ep:dirigidoPor ?dir .
+	  	FILTER (?dir = ep:D)
 	} ORDER BY ASC(?TituloDoFilme)
 
 2.	SELECT ?PrimeiroNome ?UltimoNome ?Personagem
 	WHERE {
-  	  ?Atuacao ep:noFilme ?filme ;
-  	  ep:temAtor ?ator ;
-  	  ep:comoPersonagem ?Personagem .
-	  ?filme ep:titulo ?title .
-  	  ?ator foaf:firstName ?PrimeiroNome .
-  	  ?ator foaf:familyName ?UltimoNome .
-    	  FILTER (STR(?title) = "Ft")
+  	  	?Atuacao ep:noFilme ?filme ;
+  	  	ep:temAtor ?ator ;
+  	  	ep:comoPersonagem ?Personagem .
+	  	?filme ep:titulo ?title .
+  	  	?ator foaf:firstName ?PrimeiroNome .
+  	  	?ator foaf:familyName ?UltimoNome .
+    	  	FILTER (STR(?title) = "Ft")
 	} ORDER BY ASC(?PrimeiroNome) ASC(?UltimoNome)
 
-3.	SELECT ?tit ?dir ?ano
+3.	SELECT ?Filme ?Diretor ?Ano
 	WHERE {
-  		?at1 rdf:type ep:Atuacao .
-  		?at1 ep:noFilme ?filme .
-  		?at1 ep:temAtor ?a1 .
-  		?at2 rdf:type ep:Atuacao .
-  		?at2 ep:noFilme ?filme .
-  		?at2 ep:temAtor ?a2 .
-  		?filme ep:titulo ?tit .
-  		?filme ep:dirigidoPor ?dir .
-  		?filme ep:dataEstreia ?ano .
-  		FILTER (?a1 = ep:X)
-  		FILTER (?a2 = ep:Y)
-  		FILTER (?at1 != ?at2)
-	} ORDER BY DESC(?ano)
+  		?at1 rdf:type ep:Atuacao ;
+  		ep:noFilme ?filme ;
+  		ep:temAtor ?a1 .
+  		?at2 rdf:type ep:Atuacao ;
+  		ep:noFilme ?filme ;
+  		ep:temAtor ?a2 .
+  		?filme ep:titulo ?Filme ;
+  		ep:dirigidoPor ?Diretor ;
+  		ep:dataEstreia ?Ano .
+  		FILTER (?a1 = ep:X && ?a2 = ep:Y)
+	} ORDER BY DESC(?Ano)
 
 4.	SELECT DISTINCT ?Filme ?Duracao
 	WHERE {
-  	  ?dir rdf:type ep:Diretor .
-  	  ?dir ep:dirige ?filme .
-  	  ?Filme ep:dirigidoPor ?dir .
-  	  ?Filme ep:duracao ?Duracao .
-  	  ?Atuacao ep:noFilme ?Filme ;
-  	  ep:temAtor ?ator .
-  	  VALUES ?ator { ep:X ep:Y }
-  	  FILTER (?filme = ep:F)
+  	  	?dir rdf:type ep:Diretor .
+  	  	?dir ep:dirige ?filme .
+  	  	?Filme ep:dirigidoPor ?dir .
+  	  	?Filme ep:duracao ?Duracao .
+  	  	?Atuacao ep:noFilme ?Filme ;
+  	  	ep:temAtor ?ator .
+  	 	VALUES ?ator { ep:X ep:Y }
+  	  	FILTER (?filme = ep:F)
 	} ORDER BY ASC(?Duracao)
 
-5.  	SELECT ?a ?personagem ?filmeAtuou ?filmeDirigido
+5.  	SELECT ?Pessoa (SAMPLE(?filmeat) AS ?FilmeAt) (SAMPLE(?filmedir) AS ?FilmeDir)
 	WHERE {
-  		?a rdf:type ep:Diretor .
-  		?a ep:dirige ?filmeDirigido .
-  		?at rdf:type ep:Atuacao .
-  		?at ep:temAtor ?a .
-  		?at ep:comoPersonagem ?personagem .
-  		?at ep:noFilme ?filmeAtuou.
+  		?Pessoa rdf:type ep:Diretor .
+  		?Pessoa ep:dirige ?filmedir .
+  		?Atuacao ep:temAtor ?Pessoa ;
+  		ep:noFilme ?filmeat.
+	} GROUP BY (?Pessoa)
+
+6. 	SELECT ?Ano ?Diretor ?Filme 
+	WHERE {
+        	?at1 rdf:type ep:Atuacao;
+        	ep:temAtor ?a1 ;
+  		ep:noFilme ?Filme .
+  		?at2 rdf:type ep:Atuacao;
+        	ep:temAtor ?a2 ;
+  		ep:noFilme ?Filme .
+        	?Diretor rdf:type ep:Diretor .
+  		?Diretor ep:dirige ?Filme .  		
+  		?Filme ep:dataEstreia ?Ano .
+        	FILTER(?a1 = ep:X && ?a2 = ep:Y).
+        	FILTER(?Ano >= N1 && ?Ano <= N2).  
+	} ORDER BY ASC (?Ano)
+
+7.	SELECT ?Atriz ?Ator ?Filme ?Duracao
+	WHERE {
+	  	?Filme rdf:type ep:Filme ;
+        	ep:duracao ?Duracao.
+        	?at1 rdf:type ep:Atuacao ;
+        	ep:noFilme ?Filme ;
+        	ep:temAtor ?Ator .
+        	?Ator foaf:gender ?gm .
+        	?at2 rdf:type ep:Atuacao ;
+       		ep:noFilme ?Filme ;
+        	ep:temAtor ?Atriz .
+        	?Atriz foaf:gender ?fm .
+	  	FILTER (?Duracao >= 80 && ?Duracao <= 180) .
+        	FILTER (STR(?gm) = "male" && STR(?fm) = "female") .
 	}
 
-6. 	SELECT ?n ?dir ?filme 
-	WHERE {
-  		?dir rdf:type ep:Diretor .
-  		?dir ep:dirige ?filme .
-  		?at1 rdf:type ep:Atuacao .
-  		?at1 ep:noFilme ?filme .
-  		?at1 ep:temAtor ?a1 .
-  		?at2 rdf:type ep:Atuacao .
-  		?at2 ep:noFilme ?filme .
-  		?at2 ep:temAtor ?a2 .
-  		?filme ep:dataEstreia ?n .
-  		?at1 ep:noFilme ?filmeAtuou.
-  		FILTER(?at1 != ?at2).
- 	 	FILTER(?a1 = ep:X).
-  		FILTER(?a2 = ep:Y).
-  		VALUES (?n1 ?n2){
-    			(n1 n2)
-  		}
-  		FILTER(?n >= ?n1 && ?n <= ?n2).
-  
-	}ORDER BY ASC (?n)
+8.	SELECT ?Diretor
+	WHERE{
+		{
+		SELECT ?Diretor (count(distinct ?Diretor) as ?count)
+		WHERE {
+	  		?ator rdf:type ep:Ator ;
+        		foaf:firstName ?fn ;
+        		foaf:familyName ?ln .
+        		?at rdf:type ep:Atuacao ;
+        		ep:temAtor ?ator ;
+        		ep:noFilme ?filme .
+        		?filme ep:dirigidoPor ?Diretor .
+        		FILTER (STR(?fn) = "Xp" && STR(?ln) = "Xu") .
+		} GROUP BY ?Diretor ORDER BY DESC(?count)
+   		}
+	}
 
+9.	SELECT ?Filme ?Ano ?Personagem
+	WHERE {
+        	?at rdf:type ep:Atuacao ;
+        	ep:temAtor ?ator ;
+        	ep:noFilme ?Filme ;
+        	ep:comoPersonagem ?Personagem .
+        	?Filme ep:dataEstreia ?Ano .
+        	FILTER (?ator = ep:X) .
+	} ORDER BY ASC(?Ano) LIMIT 1
+
+10.	SELECT ?Filme ?Duracao
+	WHERE {
+        	?dir ep:dirige ?Filme .        
+        	?Filme ep:duracao ?Duracao .
+        	FILTER (?dir = ep:D) .
+	} ORDER BY DESC(?Duracao) LIMIT 1
