@@ -1,0 +1,125 @@
+1. 	SELECT ?TituloDoFilme
+	WHERE {
+	  	?Filme ep:titulo ?TituloDoFilme ;
+	  	ep:dirigidoPor ?dir .
+	  	FILTER (?dir = ep:francis_ford_coppola)
+	} ORDER BY ASC(?TituloDoFilme)
+
+
+2.	SELECT ?PrimeiroNome ?UltimoNome ?Personagem
+	WHERE {
+  	  	?Atuacao ep:noFilme ?filme ;
+  	  	ep:temAtor ?ator ;
+  	  	ep:comoPersonagem ?Personagem .
+	  	?filme ep:titulo ?title .
+  	  	?ator foaf:firstName ?PrimeiroNome ;
+  	  	foaf:familyName ?UltimoNome .
+    	  	FILTER (STR(?title) = "Home Alone 3")
+	} ORDER BY ASC(?PrimeiroNome) ASC(?UltimoNome)
+
+
+3.	SELECT ?Filme ?Diretor ?Ano
+	WHERE {
+  		?at1 rdf:type ep:Atuacao ;
+  		ep:noFilme ?Filme ;
+  		ep:temAtor ?a1 .
+  		?at2 rdf:type ep:Atuacao ;
+  		ep:noFilme ?Filme ;
+  		ep:temAtor ?a2 .
+  		?Filme ep:dirigidoPor ?Diretor ;
+  		ep:dataEstreia ?Ano .
+  		FILTER (?a1 = ep:sofia_coppola && ?a2 = ep:al_pacino)
+	} ORDER BY DESC(?Ano)
+
+
+4. 	SELECT DISTINCT ?Filme ?Duracao
+	WHERE {
+  	  	?dir rdf:type ep:Diretor .
+  	  	?dir ep:dirige ?filme .
+  	  	?Filme ep:dirigidoPor ?dir .
+  	  	?Filme ep:duracao ?Duracao .
+  	  	?Atuacao ep:noFilme ?Filme ;
+  	  	ep:temAtor ?ator .
+  	 	VALUES ?ator { ep:diane_keaton ep:diane_lane }
+  	  	FILTER (?filme = ep:the_outsiders)
+	} ORDER BY ASC(?Duracao)
+
+
+5.	SELECT ?Pessoa (SAMPLE(?filmeat) AS ?FilmeAt) (SAMPLE(?filmedir) AS ?FilmeDir)
+	WHERE {
+  		?Pessoa rdf:type ep:Diretor .
+  		?Pessoa ep:dirige ?filmedir .
+  		?Atuacao ep:temAtor ?Pessoa ;
+  		ep:noFilme ?filmeat.
+	} GROUP BY (?Pessoa)
+
+
+6. 	SELECT ?Ano ?Diretor ?Filme 
+	WHERE {
+        	?at1 rdf:type ep:Atuacao;
+        	ep:temAtor ?a1 ;
+  		ep:noFilme ?Filme .
+  		?at2 rdf:type ep:Atuacao;
+        	ep:temAtor ?a2 ;
+  		ep:noFilme ?Filme .
+        	?Diretor rdf:type ep:Diretor .
+  		?Diretor ep:dirige ?Filme .  		
+  		?Filme ep:dataEstreia ?Ano .
+        	FILTER(?a1 = ep:al_pacino && ?a2 = ep:talia_shire).
+        	FILTER(?Ano >= 1950 && ?Ano <= 1985).  
+	} ORDER BY ASC (?Ano)
+
+
+*Esse print utiliza a segunda versão da consulta, onde há apenas um exemplo de casal por filme.
+7. 	SELECT (SAMPLE(?atriz)AS ?Atriz) (SAMPLE(?ator)AS ?Ator) ?Filme (SAMPLE(?duracao) AS ?Duracao)
+	WHERE {
+	  	?Filme rdf:type ep:Filme ;
+        	ep:duracao ?duracao.
+        	?at1 rdf:type ep:Atuacao ;
+        	ep:noFilme ?Filme ;
+        	ep:temAtor ?ator .
+        	?ator foaf:gender ?gm .
+        	?at2 rdf:type ep:Atuacao ;
+       		ep:noFilme ?Filme ;
+        	ep:temAtor ?atriz .
+        	?atriz foaf:gender ?fm .
+	  	FILTER (?duracao >= 85 && ?duracao <= 100) .
+        	FILTER (STR(?gm) = "male" && STR(?fm) = "female") .
+	}GROUP BY ?Filme ORDER BY ASC (?Duracao)
+
+
+8.	SELECT ?Diretor
+	WHERE{
+		{
+		SELECT ?Diretor (count(?Diretor) as ?count)
+		WHERE {
+	  		?ator rdf:type ep:Ator ;
+        		foaf:firstName ?fn ;
+        		foaf:familyName ?ln .
+        		?at rdf:type ep:Atuacao ;
+        		ep:temAtor ?ator ;
+        		ep:noFilme ?filme .
+        		?filme ep:dirigidoPor ?Diretor .
+        		FILTER (STR(?fn) = "Sofia" && STR(?ln) = "Coppola") .
+		} GROUP BY ?Diretor ORDER BY DESC(?count)
+   		}
+	} LIMIT 1
+
+
+9. 	SELECT ?Filme ?Ano ?Personagem
+	WHERE {
+        	?at rdf:type ep:Atuacao ;
+        	ep:temAtor ?ator ;
+        	ep:noFilme ?Filme ;
+        	ep:comoPersonagem ?Personagem .
+        	?Filme ep:dataEstreia ?Ano .
+        	FILTER (?ator = ep:tom_cruise) .
+	} ORDER BY ASC(?Ano) LIMIT 1
+
+
+10.	SELECT ?Filme ?Duracao
+	WHERE {
+        	?dir ep:dirige ?Filme .        
+        	?Filme ep:duracao ?Duracao .
+        	FILTER (?dir = ep:ethan_coen) .
+	} ORDER BY DESC(?Duracao) LIMIT 1
