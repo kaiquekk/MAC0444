@@ -18,8 +18,8 @@ Cabeçalho que deve estar presente em todas as queries:
 
 1. 	SELECT ?TituloDoFilme
 	WHERE {
-	  	?Filme ep:titulo ?TituloDoFilme .
-	  	?Filme ep:dirigidoPor ?dir .
+	  	?Filme ep:titulo ?TituloDoFilme ;
+	  	ep:dirigidoPor ?dir .
 	  	FILTER (?dir = ep:D)
 	} ORDER BY ASC(?TituloDoFilme)
 
@@ -29,21 +29,20 @@ Cabeçalho que deve estar presente em todas as queries:
   	  	ep:temAtor ?ator ;
   	  	ep:comoPersonagem ?Personagem .
 	  	?filme ep:titulo ?title .
-  	  	?ator foaf:firstName ?PrimeiroNome .
-  	  	?ator foaf:familyName ?UltimoNome .
+  	  	?ator foaf:firstName ?PrimeiroNome ;
+  	  	foaf:familyName ?UltimoNome .
     	  	FILTER (STR(?title) = "Ft")
 	} ORDER BY ASC(?PrimeiroNome) ASC(?UltimoNome)
 
 3.	SELECT ?Filme ?Diretor ?Ano
 	WHERE {
   		?at1 rdf:type ep:Atuacao ;
-  		ep:noFilme ?filme ;
+  		ep:noFilme ?Filme ;
   		ep:temAtor ?a1 .
   		?at2 rdf:type ep:Atuacao ;
-  		ep:noFilme ?filme ;
+  		ep:noFilme ?Filme ;
   		ep:temAtor ?a2 .
-  		?filme ep:titulo ?Filme ;
-  		ep:dirigidoPor ?Diretor ;
+  		?Filme ep:dirigidoPor ?Diretor ;
   		ep:dataEstreia ?Ano .
   		FILTER (?a1 = ep:X && ?a2 = ep:Y)
 	} ORDER BY DESC(?Ano)
@@ -83,6 +82,7 @@ Cabeçalho que deve estar presente em todas as queries:
         	FILTER(?Ano >= N1 && ?Ano <= N2).  
 	} ORDER BY ASC (?Ano)
 
+*Essa consulta assume que casais de atores em um mesmo filme são válidos, então o resultado possuirá todas as permutações de atores e atrizes de um mesmo filme.
 7.	SELECT ?Atriz ?Ator ?Filme ?Duracao
 	WHERE {
 	  	?Filme rdf:type ep:Filme ;
@@ -95,14 +95,31 @@ Cabeçalho que deve estar presente em todas as queries:
        		ep:noFilme ?Filme ;
         	ep:temAtor ?Atriz .
         	?Atriz foaf:gender ?fm .
-	  	FILTER (?Duracao >= 80 && ?Duracao <= 180) .
+	  	FILTER (?Duracao >= M1 && ?Duracao <= M2) .
         	FILTER (STR(?gm) = "male" && STR(?fm) = "female") .
-	}
+	} ORDER BY ASC (?Duracao)
+
+*Essa versão da consulta agrupa por filme, então haverá apenas um exemplo de casal por filme.
+	SELECT (SAMPLE(?atriz)AS ?Atriz) (SAMPLE(?ator)AS ?Ator) ?Filme (SAMPLE(?duracao) AS ?Duracao)
+	WHERE {
+	  	?Filme rdf:type ep:Filme ;
+        	ep:duracao ?duracao.
+        	?at1 rdf:type ep:Atuacao ;
+        	ep:noFilme ?Filme ;
+        	ep:temAtor ?ator .
+        	?ator foaf:gender ?gm .
+        	?at2 rdf:type ep:Atuacao ;
+       		ep:noFilme ?Filme ;
+        	ep:temAtor ?atriz .
+        	?atriz foaf:gender ?fm .
+	  	FILTER (?duracao >= M1 && ?duracao <= M2) .
+        	FILTER (STR(?gm) = "male" && STR(?fm) = "female") .
+	} GROUP BY ?Filme ORDER BY ASC (?Duracao)
 
 8.	SELECT ?Diretor
 	WHERE{
 		{
-		SELECT ?Diretor (count(distinct ?Diretor) as ?count)
+		SELECT ?Diretor (count(?Diretor) as ?count)
 		WHERE {
 	  		?ator rdf:type ep:Ator ;
         		foaf:firstName ?fn ;
@@ -114,7 +131,7 @@ Cabeçalho que deve estar presente em todas as queries:
         		FILTER (STR(?fn) = "Xp" && STR(?ln) = "Xu") .
 		} GROUP BY ?Diretor ORDER BY DESC(?count)
    		}
-	}
+	} LIMIT 1
 
 9.	SELECT ?Filme ?Ano ?Personagem
 	WHERE {
