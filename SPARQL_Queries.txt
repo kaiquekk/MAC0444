@@ -1,20 +1,16 @@
-*Para executar as queries, usar a interface gráfica providenciada pelo monitor em https://github.com/viniciusbm/sparqlguiwrapper.
-
-*Para remover os datatypes na hora do resultado: https://stackoverflow.com/questions/23626194/removing-datatypes-from-literals-in-sparql-results
-
-*Verificar se os parâmetros de string das consultas 2 e 8 devem ser STR(?title)="Ft" ou STR(?title)=Ft.
-
-*Verificar se é para repetir pessoas na consulta 5.
-
 Cabeçalho que deve estar presente em todas as queries:
 
 	PREFIX  rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-	PREFIX  owl: <http://www.w3.org/2002/07/owl#>
-	PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-	PREFIX  xsd: <http://www.w3.org/2001/XMLSchema#>
 	PREFIX   ep: <http://www.semanticweb.org/kaiqu/ontologies/2019/10MAC444-EP#>
 	PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 
+Os prefixos, que sucedem as instruções PREFIX, são termos que facilitam a referenciação das URIs nas queries em SPARQL.
+Nas consultas utilizamos três prefixos: 
+O prefixo ep se refere à nossa ontologia criada nesse projeto.
+O prefixo foaf se refere à ontologia 'Friend of Another Friend', importada na nossa ontologia para uso das classes Person e Agent e das propriedades firstName, FamilyName, Gender, made e maker.
+O prefixo rdf se refere ao modelo padrão de ontologias web rdf.
+
+Queries em SPARQL:
 
 1. 	SELECT ?TituloDoFilme
 	WHERE {
@@ -82,25 +78,7 @@ Cabeçalho que deve estar presente em todas as queries:
         	FILTER(?Ano >= N1 && ?Ano <= N2).  
 	} ORDER BY ASC (?Ano)
 
-*Essa consulta assume que casais de atores em um mesmo filme são válidos, então o resultado possuirá todas as permutações de atores e atrizes de um mesmo filme.
-7.	SELECT ?Atriz ?Ator ?Filme ?Duracao
-	WHERE {
-	  	?Filme rdf:type ep:Filme ;
-        	ep:duracao ?Duracao.
-        	?at1 rdf:type ep:Atuacao ;
-        	ep:noFilme ?Filme ;
-        	ep:temAtor ?Ator .
-        	?Ator foaf:gender ?gm .
-        	?at2 rdf:type ep:Atuacao ;
-       		ep:noFilme ?Filme ;
-        	ep:temAtor ?Atriz .
-        	?Atriz foaf:gender ?fm .
-	  	FILTER (?Duracao >= M1 && ?Duracao <= M2) .
-        	FILTER (STR(?gm) = "male" && STR(?fm) = "female") .
-	} ORDER BY ASC (?Duracao)
-
-*Essa versão da consulta agrupa por filme, então haverá apenas um exemplo de casal por filme.
-	SELECT (SAMPLE(?atriz)AS ?Atriz) (SAMPLE(?ator)AS ?Ator) ?Filme (SAMPLE(?duracao) AS ?Duracao)
+7.	SELECT (SAMPLE(?atriz)AS ?Atriz) (SAMPLE(?ator)AS ?Ator) ?Filme (SAMPLE(?duracao) AS ?Duracao)
 	WHERE {
 	  	?Filme rdf:type ep:Filme ;
         	ep:duracao ?duracao.
