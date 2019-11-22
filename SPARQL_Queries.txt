@@ -1,4 +1,4 @@
-Cabeçalho que deve estar presente em todas as queries:
+Cabeçalho que deve estar presente antes de todas as queries:
 
 	PREFIX  rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 	PREFIX   ep: <http://www.semanticweb.org/kaiqu/ontologies/2019/10MAC444-EP#>
@@ -7,8 +7,8 @@ Cabeçalho que deve estar presente em todas as queries:
 Os prefixos, que sucedem as instruções PREFIX, são termos que facilitam a referenciação das URIs nas queries em SPARQL.
 Nas consultas utilizamos três prefixos: 
 O prefixo ep se refere à nossa ontologia criada nesse projeto.
-O prefixo foaf se refere à ontologia 'Friend of Another Friend', importada na nossa ontologia para uso das classes Person e Agent e das propriedades firstName, FamilyName, Gender, made e maker.
-O prefixo rdf se refere ao modelo padrão de ontologias web rdf.
+O prefixo foaf se refere à ontologia 'Friend of Another Friend', importada na nossa ontologia para uso das classes Person e Agent e das propriedades firstName, familyName, gender, made e maker.
+O prefixo rdf se refere ao modelo padrão de ontologias web 'Resource Description Framework'.
 
 Queries em SPARQL:
 
